@@ -2,6 +2,7 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![FastMCP](https://img.shields.io/badge/MCP-FastMCP-green.svg)](https://github.com/jlowin/fastmcp)
+[![PyPI version](https://badge.fury.io/py/mcp-background-job.svg)](https://badge.fury.io/py/mcp-background-job)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 An MCP (Model Context Protocol) server that enables coding agents to execute long-running shell commands asynchronously with full process management capabilities.
@@ -21,15 +22,56 @@ The MCP Background Job Server provides a robust solution for running shell comma
 
 ## Installation
 
-### Prerequisites
+### Quick Install (Recommended)
+
+Install directly from PyPI using `uvx`:
+
+```bash
+# Install and run the MCP server
+uvx mcp-background-job
+```
+
+### Claude Code Integration
+
+Add the server to your Claude Code configuration:
+
+1. **Option A: Using Claude Code Desktop**
+   - Open Claude Code settings/preferences
+   - Navigate to MCP Servers section  
+   - Add a new server:
+     - **Name**: `background-job`
+     - **Command**: `uvx`
+     - **Args**: `["mcp-background-job"]`
+
+2. **Option B: Configuration File**
+   Add to your Claude Code configuration file:
+   ```json
+   {
+     "mcpServers": {
+       "background-job": {
+         "command": "uvx",
+         "args": ["mcp-background-job"]
+       }
+     }
+   }
+   ```
+
+3. **Restart Claude Code** to load the new MCP server.
+
+### Development Setup
+
+For local development or contributing:
+
+#### Prerequisites
 
 - Python 3.12 or higher
 - [uv](https://docs.astral.sh/uv/) package manager
 
-### Setup
+#### Setup Steps
 
 1. **Clone and navigate to the project directory:**
    ```bash
+   git clone https://github.com/dylan-gluck/mcp-background-job.git
    cd mcp-background-job
    ```
 
@@ -45,14 +87,33 @@ The MCP Background Job Server provides a robust solution for running shell comma
 
 ## Quick Start
 
-### Running the Server
+### Using with Claude Code
+
+Once configured, ask Claude to help you with background tasks:
+
+```
+You: "Start my development server in the background and monitor it"
+
+Claude: I'll start your development server using the background job server.
+
+[Uses the execute tool to run your dev server]
+[Shows job ID and monitors startup progress]
+[Provides status updates]
+
+Claude: "Your development server is now running on http://localhost:3000. 
+The job ID is abc123-def456 if you need to control it later."
+```
+
+### Manual Server Usage
+
+For development or direct usage:
 
 ```bash
 # Run with stdio transport (most common)
-uv run python -m mcp_background_job
+uvx mcp-background-job
 
-# Or run the server module directly
-uv run python src/mcp_background_job/server.py
+# Or for development:
+uv run python -m mcp_background_job
 ```
 
 ### Basic Usage Example
@@ -115,16 +176,41 @@ Configure the server behavior using these environment variables:
 
 ```bash
 # Maximum concurrent jobs (default: 10)
-export MCP_BG_MAX_JOBS=10
+export MCP_BG_MAX_JOBS=20
 
 # Maximum output buffer per job (default: 10MB)
-export MCP_BG_MAX_OUTPUT_SIZE=10485760
+export MCP_BG_MAX_OUTPUT_SIZE=20MB
+# or in bytes:
+export MCP_BG_MAX_OUTPUT_SIZE=20971520
 
 # Default job timeout in seconds (default: no timeout)
 export MCP_BG_JOB_TIMEOUT=3600
 
 # Cleanup interval for completed jobs in seconds (default: 300)
-export MCP_BG_CLEANUP_INTERVAL=300
+export MCP_BG_CLEANUP_INTERVAL=600
+
+# Working directory for jobs (default: current directory)
+export MCP_BG_WORKING_DIR=/path/to/project
+
+# Allowed command patterns (optional security restriction)
+export MCP_BG_ALLOWED_COMMANDS="^npm ,^python ,^echo ,^ls"
+```
+
+### Claude Code Configuration with Environment Variables
+
+```json
+{
+  "mcpServers": {
+    "background-job": {
+      "command": "uvx",
+      "args": ["mcp-background-job"],
+      "env": {
+        "MCP_BG_MAX_JOBS": "20",
+        "MCP_BG_MAX_OUTPUT_SIZE": "20MB"
+      }
+    }
+  }
+}
 ```
 
 ### Programmatic Configuration
@@ -295,6 +381,12 @@ uv run pytest tests/
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
+
+### v0.1.1
+- Published to PyPI for easy installation via `uvx`
+- Added console script entry point (`mcp-background-job`)
+- Updated documentation with installation and usage instructions
+- Fixed linting issues and improved code quality
 
 ### v0.1.0
 - Initial implementation with full MCP tool support
