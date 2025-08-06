@@ -1,6 +1,7 @@
 """Job management service for background processes."""
 
 import logging
+import re
 import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -10,6 +11,23 @@ from .models import BackgroundJob, JobStatus, JobSummary, ProcessOutput
 from .process import ProcessWrapper
 
 logger = logging.getLogger(__name__)
+
+# Dangerous command patterns to block for basic security
+BLOCKED_COMMAND_PATTERNS = [
+    r'rm\s+.*-rf.*/',           # Prevent rm -rf with paths
+    r'sudo\s+rm',               # Prevent sudo rm
+    r'>\s*/dev/',               # Prevent writing to /dev/
+    r'wget.*\|.*sh',            # Prevent wget | sh
+    r'curl.*\|.*sh',            # Prevent curl | sh
+    r'curl.*\|.*bash',          # Prevent curl | bash
+    r'dd\s+if=.*of=/dev/',      # Prevent disk writes
+    r'mkfs\.',                  # Prevent filesystem creation
+    r'fdisk',                   # Prevent disk partitioning
+    r':(){ :|:& };:',           # Prevent fork bomb
+    r'cat\s+/dev/urandom',      # Prevent random data spam
+    r'chmod.*777.*/',           # Prevent dangerous permissions on root
+    r'chown.*root.*/',          # Prevent ownership changes to root
+]
 
 
 class JobManager:
@@ -30,6 +48,35 @@ class JobManager:
             f"max_output_size={self.config.max_output_size_bytes}"
         )
 
+    def _validate_command_security(self, command: str) -> None:
+        """Validate command against security policies.
+        
+        Args:
+            command: Shell command to validate
+            
+        Raises:
+            ValueError: If command contains dangerous patterns or violates policies
+        """
+        # Check against blocked patterns
+        for pattern in BLOCKED_COMMAND_PATTERNS:
+            if re.search(pattern, command, re.IGNORECASE):
+                logger.warning(f"Blocked dangerous command pattern: {command}")
+                raise ValueError(f"Command contains dangerous pattern and is not allowed: {command}")
+        
+        # Check against configured allowed patterns (if any)
+        if self.config.allowed_command_patterns:
+            allowed = False
+            for allowed_pattern in self.config.allowed_command_patterns:
+                if re.search(allowed_pattern, command, re.IGNORECASE):
+                    allowed = True
+                    break
+            
+            if not allowed:
+                logger.warning(f"Command not in allowed patterns: {command}")
+                raise ValueError(f"Command not in allowed patterns: {command}")
+        
+        logger.debug(f"Command security validation passed: {command}")
+
     async def execute_command(self, command: str) -> str:
         """Execute command as background job, return job_id.
 
@@ -45,6 +92,9 @@ class JobManager:
         """
         if not command or not command.strip():
             raise ValueError("Command cannot be empty")
+
+        # Validate command security
+        self._validate_command_security(command.strip())
 
         # Check job limit
         running_jobs = sum(
