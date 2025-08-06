@@ -1,16 +1,17 @@
 # MCP Background Job Server - Implementation TODO
 
-## Phase 1: Project Setup
+## Phase 1: Project Setup ✅ COMPLETED
 
-- [ ] Initialize Python project structure
-  - [ ] Create pyproject.toml with dependencies
-  - [ ] Set up src/mcp_background_job package structure
-  - [ ] Configure dev dependencies (pytest, ruff, etc.)
+- [x] Initialize Python project structure
+  - [x] Initialize project (`uv init`)
+  - [x] Initialize virtual environment (`uv venv`)
+  - [x] Add & configure dev dependencies (pytest, ruff, etc.) (`uv add`)
+  - [x] Set up src/mcp_background_job package structure
 
-- [ ] Set up development environment
-  - [ ] Create uv.lock file
-  - [ ] Configure pytest.ini for test discovery
-  - [ ] Set up logging configuration
+- [x] Set up development environment
+  - [x] Sync dependencies (`uv sync`)
+  - [x] Configure pytest.ini for test discovery
+  - [x] Set up logging configuration
 
 ## Phase 2: Core Data Models
 
