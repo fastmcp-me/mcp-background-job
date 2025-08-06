@@ -1,7 +1,7 @@
 """Tests for MCP server startup and configuration."""
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from mcp_background_job.server import get_job_manager, cleanup_on_shutdown
 from mcp_background_job.service import JobManager

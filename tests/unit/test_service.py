@@ -3,7 +3,6 @@
 import asyncio
 import pytest
 import uuid
-from datetime import datetime, timezone
 
 from mcp_background_job.config import BackgroundJobConfig
 from mcp_background_job.models import JobStatus, ProcessOutput
@@ -278,7 +277,7 @@ class TestJobManager:
         manager = JobManager()
 
         # Add a job
-        job_id = await manager.execute_command("echo 'test'")
+        await manager.execute_command("echo 'test'")
 
         stats = manager.get_stats()
         assert stats["total"] == 1
@@ -298,7 +297,7 @@ class TestJobManager:
         manager = JobManager()
 
         # Start and complete a job
-        job_id = await manager.execute_command("echo 'cleanup test'")
+        await manager.execute_command("echo 'cleanup test'")
         await asyncio.sleep(0.5)  # Wait for completion
 
         # Cleanup should clean up the completed process

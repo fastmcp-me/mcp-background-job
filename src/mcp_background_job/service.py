@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 
 # Dangerous command patterns to block for basic security
 BLOCKED_COMMAND_PATTERNS = [
-    r'rm\s+.*-rf.*/',           # Prevent rm -rf with paths
-    r'sudo\s+rm',               # Prevent sudo rm
-    r'>\s*/dev/',               # Prevent writing to /dev/
-    r'wget.*\|.*sh',            # Prevent wget | sh
-    r'curl.*\|.*sh',            # Prevent curl | sh
-    r'curl.*\|.*bash',          # Prevent curl | bash
-    r'dd\s+if=.*of=/dev/',      # Prevent disk writes
-    r'mkfs\.',                  # Prevent filesystem creation
-    r'fdisk',                   # Prevent disk partitioning
-    r':(){ :|:& };:',           # Prevent fork bomb
-    r'cat\s+/dev/urandom',      # Prevent random data spam
-    r'chmod.*777.*/',           # Prevent dangerous permissions on root
-    r'chown.*root.*/',          # Prevent ownership changes to root
+    r"rm\s+.*-rf.*/",  # Prevent rm -rf with paths
+    r"sudo\s+rm",  # Prevent sudo rm
+    r">\s*/dev/",  # Prevent writing to /dev/
+    r"wget.*\|.*sh",  # Prevent wget | sh
+    r"curl.*\|.*sh",  # Prevent curl | sh
+    r"curl.*\|.*bash",  # Prevent curl | bash
+    r"dd\s+if=.*of=/dev/",  # Prevent disk writes
+    r"mkfs\.",  # Prevent filesystem creation
+    r"fdisk",  # Prevent disk partitioning
+    r":(){ :|:& };:",  # Prevent fork bomb
+    r"cat\s+/dev/urandom",  # Prevent random data spam
+    r"chmod.*777.*/",  # Prevent dangerous permissions on root
+    r"chown.*root.*/",  # Prevent ownership changes to root
 ]
 
 
@@ -50,10 +50,10 @@ class JobManager:
 
     def _validate_command_security(self, command: str) -> None:
         """Validate command against security policies.
-        
+
         Args:
             command: Shell command to validate
-            
+
         Raises:
             ValueError: If command contains dangerous patterns or violates policies
         """
@@ -61,8 +61,10 @@ class JobManager:
         for pattern in BLOCKED_COMMAND_PATTERNS:
             if re.search(pattern, command, re.IGNORECASE):
                 logger.warning(f"Blocked dangerous command pattern: {command}")
-                raise ValueError(f"Command contains dangerous pattern and is not allowed: {command}")
-        
+                raise ValueError(
+                    f"Command contains dangerous pattern and is not allowed: {command}"
+                )
+
         # Check against configured allowed patterns (if any)
         if self.config.allowed_command_patterns:
             allowed = False
@@ -70,11 +72,11 @@ class JobManager:
                 if re.search(allowed_pattern, command, re.IGNORECASE):
                     allowed = True
                     break
-            
+
             if not allowed:
                 logger.warning(f"Command not in allowed patterns: {command}")
                 raise ValueError(f"Command not in allowed patterns: {command}")
-        
+
         logger.debug(f"Command security validation passed: {command}")
 
     async def execute_command(self, command: str) -> str:
@@ -142,7 +144,7 @@ class JobManager:
             # Clean up on failure
             try:
                 process_wrapper.cleanup()
-            except:
+            except Exception:
                 pass
             raise
 

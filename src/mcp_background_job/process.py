@@ -5,7 +5,6 @@ import logging
 import shlex
 import subprocess
 import threading
-import time
 from collections import deque
 from datetime import datetime, timezone
 from typing import Deque, Optional
@@ -327,5 +326,5 @@ class ProcessWrapper:
         """Destructor to ensure cleanup."""
         try:
             self.cleanup()
-        except:
+        except Exception:
             pass  # Ignore errors during cleanup in destructor

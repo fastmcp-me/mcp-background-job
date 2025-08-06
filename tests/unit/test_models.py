@@ -12,12 +12,6 @@ from mcp_background_job.models import (
     ExecuteInput,
     ExecuteOutput,
     TailInput,
-    StatusInput,
-    StatusOutput,
-    KillInput,
-    KillOutput,
-    OutputInput,
-    InteractInput,
     ListOutput,
 )
 

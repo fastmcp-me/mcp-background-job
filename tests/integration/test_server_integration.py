@@ -162,7 +162,7 @@ class TestServerIntegration:
         initial_total = stats["total"]
 
         # Add some jobs
-        job_id1 = await job_manager.execute_command("echo 'job1'")
+        await job_manager.execute_command("echo 'job1'")
         job_id2 = await job_manager.execute_command("sleep 5")
 
         # Check updated stats

@@ -7,7 +7,7 @@ from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from pydantic import Field
 
-from .config import BackgroundJobConfig, load_config
+from .config import load_config
 from .models import ExecuteOutput, KillOutput, ListOutput, ProcessOutput, StatusOutput
 from .service import JobManager
 

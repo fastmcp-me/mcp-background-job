@@ -1,9 +1,6 @@
 """Unit tests for ProcessWrapper class."""
 
 import asyncio
-import os
-import time
-from unittest.mock import Mock, patch
 
 import pytest
 
@@ -160,7 +157,7 @@ class TestProcessWrapper:
         await wrapper.start()
 
         # Send input
-        result = await wrapper.send_input("hello world")
+        await wrapper.send_input("hello world")
 
         # Wait a bit for output
         await asyncio.sleep(0.1)
@@ -198,7 +195,7 @@ class TestProcessWrapper:
         wrapper = ProcessWrapper("test-job-1", "sleep 10")
 
         await wrapper.start()
-        original_pid = wrapper.get_pid()
+        wrapper.get_pid()
 
         # Process should be running
         assert wrapper.get_status() == JobStatus.RUNNING
